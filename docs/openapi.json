@@ -1,0 +1,2309 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "新北市垃圾車即時位置 API",
+    "description": "\n新北市**垃圾清運車輛即時位置** Open Data 的 RESTful API。\n\n資料來源：[新北市政府資料開放平台](https://data.ntpc.gov.tw/datasets/28ab4122-60e1-4065-98e5-abccb69aaca6)\n\n原始資料被正規化為 4 種 Resource，各自提供完整 CRUD：\n\n| Resource | 說明 | 主鍵 |\n|---|---|---|\n| `districts` | 行政區 | `city_id` |\n| `routes` | 清運路線 | `line_id` |\n| `trucks` | 垃圾車 | `car`（車牌） |\n| `locations` | 位置紀錄 | `id` |\n\n關聯：District 1─N Route 1─N Truck 1─N Location\n",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/districts": {
+      "get": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "列出行政區",
+        "operationId": "list_districts_api_v1_districts_get",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "行政區名稱（模糊比對）",
+              "title": "Name"
+            },
+            "description": "行政區名稱（模糊比對）"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistrictPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "新增行政區",
+        "operationId": "create_district_api_v1_districts_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistrictCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistrictOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/districts/{city_id}": {
+      "get": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "查詢單一行政區",
+        "operationId": "get_district_api_v1_districts__city_id__get",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "City Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistrictOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "更新行政區（整筆）",
+        "operationId": "replace_district_api_v1_districts__city_id__put",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "City Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistrictUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistrictOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "更新行政區（部分）",
+        "operationId": "patch_district_api_v1_districts__city_id__patch",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "City Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistrictPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DistrictOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "刪除行政區",
+        "operationId": "delete_district_api_v1_districts__city_id__delete",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "City Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/districts/{city_id}/routes": {
+      "get": {
+        "tags": [
+          "Districts 行政區"
+        ],
+        "summary": "列出行政區內的清運路線",
+        "operationId": "list_district_routes_api_v1_districts__city_id__routes_get",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "City Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RouteOut"
+                  },
+                  "title": "Response List District Routes Api V1 Districts  City Id  Routes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/routes": {
+      "get": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "列出清運路線",
+        "operationId": "list_routes_api_v1_routes_get",
+        "parameters": [
+          {
+            "name": "city_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "依行政區代碼篩選",
+              "title": "City Id"
+            },
+            "description": "依行政區代碼篩選"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutePage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "新增路線",
+        "operationId": "create_route_api_v1_routes_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/routes/{line_id}": {
+      "get": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "查詢單一路線",
+        "operationId": "get_route_api_v1_routes__line_id__get",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Line Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "更新路線（整筆）",
+        "operationId": "replace_route_api_v1_routes__line_id__put",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Line Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "更新路線（部分）",
+        "operationId": "patch_route_api_v1_routes__line_id__patch",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Line Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutePatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "刪除路線",
+        "operationId": "delete_route_api_v1_routes__line_id__delete",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Line Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/routes/{line_id}/trucks": {
+      "get": {
+        "tags": [
+          "Routes 清運路線"
+        ],
+        "summary": "列出路線上的垃圾車",
+        "operationId": "list_route_trucks_api_v1_routes__line_id__trucks_get",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Line Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TruckOut"
+                  },
+                  "title": "Response List Route Trucks Api V1 Routes  Line Id  Trucks Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trucks": {
+      "get": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "列出垃圾車",
+        "operationId": "list_trucks_api_v1_trucks_get",
+        "parameters": [
+          {
+            "name": "line_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "依路線編號篩選",
+              "title": "Line Id"
+            },
+            "description": "依路線編號篩選"
+          },
+          {
+            "name": "city_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "依行政區代碼篩選",
+              "title": "City Id"
+            },
+            "description": "依行政區代碼篩選"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruckPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "新增垃圾車",
+        "operationId": "create_truck_api_v1_trucks_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TruckCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruckOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trucks/{car}": {
+      "get": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "查詢單一垃圾車",
+        "operationId": "get_truck_api_v1_trucks__car__get",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruckOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "更新垃圾車（整筆）",
+        "operationId": "replace_truck_api_v1_trucks__car__put",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TruckUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruckOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "更新垃圾車（部分）",
+        "operationId": "patch_truck_api_v1_trucks__car__patch",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TruckPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TruckOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "刪除垃圾車",
+        "operationId": "delete_truck_api_v1_trucks__car__delete",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trucks/{car}/locations": {
+      "get": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "列出垃圾車的位置紀錄",
+        "operationId": "list_truck_locations_api_v1_trucks__car__locations_get",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationOut"
+                  },
+                  "title": "Response List Truck Locations Api V1 Trucks  Car  Locations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trucks/{car}/latest": {
+      "get": {
+        "tags": [
+          "Trucks 垃圾車"
+        ],
+        "summary": "垃圾車最新位置",
+        "operationId": "get_truck_latest_api_v1_trucks__car__latest_get",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Car"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations": {
+      "get": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "列出位置紀錄",
+        "operationId": "list_locations_api_v1_locations_get",
+        "parameters": [
+          {
+            "name": "car",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "依車牌篩選",
+              "title": "Car"
+            },
+            "description": "依車牌篩選"
+          },
+          {
+            "name": "city_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "依行政區代碼篩選",
+              "title": "City Id"
+            },
+            "description": "依行政區代碼篩選"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "起始時間（含）",
+              "title": "Since"
+            },
+            "description": "起始時間（含）"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "結束時間（含）",
+              "title": "Until"
+            },
+            "description": "結束時間（含）"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "新增位置紀錄",
+        "operationId": "create_location_api_v1_locations_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations/nearby": {
+      "get": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "查詢附近的垃圾車",
+        "description": "回傳距離指定座標 `radius_m` 公尺內的位置紀錄，由近到遠排序。",
+        "operationId": "nearby_locations_api_v1_locations_nearby_get",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90,
+              "minimum": -90,
+              "examples": [
+                25.012
+              ],
+              "title": "Lat"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180,
+              "minimum": -180,
+              "examples": [
+                121.4627
+              ],
+              "title": "Lon"
+            }
+          },
+          {
+            "name": "radius_m",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 50000,
+              "exclusiveMinimum": 0,
+              "default": 1000,
+              "title": "Radius M"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NearbyLocationOut"
+                  },
+                  "title": "Response Nearby Locations Api V1 Locations Nearby Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/locations/{location_id}": {
+      "get": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "查詢單筆位置紀錄",
+        "operationId": "get_location_api_v1_locations__location_id__get",
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Location Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "更新位置紀錄（整筆）",
+        "operationId": "replace_location_api_v1_locations__location_id__put",
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Location Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "更新位置紀錄（部分）",
+        "operationId": "patch_location_api_v1_locations__location_id__patch",
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Location Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Locations 位置紀錄"
+        ],
+        "summary": "刪除位置紀錄",
+        "operationId": "delete_location_api_v1_locations__location_id__delete",
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Location Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/refresh": {
+      "post": {
+        "tags": [
+          "Admin 資料維護"
+        ],
+        "summary": "重新抓取 Open Data 並匯入",
+        "description": "從新北市資料開放平台下載最新垃圾車位置，覆寫 data/garbage_trucks.json，並重建位置紀錄。",
+        "operationId": "refresh_api_v1_admin_refresh_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "DistrictCreate": {
+        "properties": {
+          "city_name": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "City Name",
+            "examples": [
+              "板橋區"
+            ]
+          },
+          "city_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "City Id",
+            "examples": [
+              "6500100"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_name",
+          "city_id"
+        ],
+        "title": "DistrictCreate"
+      },
+      "DistrictOut": {
+        "properties": {
+          "city_name": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "City Name",
+            "examples": [
+              "板橋區"
+            ]
+          },
+          "city_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "City Id",
+            "examples": [
+              "6500100"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_name",
+          "city_id"
+        ],
+        "title": "DistrictOut"
+      },
+      "DistrictPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DistrictOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "DistrictPage"
+      },
+      "DistrictPatch": {
+        "properties": {
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 32
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          }
+        },
+        "type": "object",
+        "title": "DistrictPatch"
+      },
+      "DistrictUpdate": {
+        "properties": {
+          "city_name": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "City Name",
+            "examples": [
+              "板橋區"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_name"
+        ],
+        "title": "DistrictUpdate"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LocationCreate": {
+        "properties": {
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "examples": [
+              "KEA-0001"
+            ]
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At",
+            "examples": [
+              "2026-10-06T20:42:37"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Address",
+            "examples": [
+              "新北市板橋區中山路一段161號"
+            ]
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude",
+            "examples": [
+              121.4627
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude",
+            "examples": [
+              25.012
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "car",
+          "recorded_at",
+          "address",
+          "longitude",
+          "latitude"
+        ],
+        "title": "LocationCreate"
+      },
+      "LocationOut": {
+        "properties": {
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "examples": [
+              "KEA-0001"
+            ]
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At",
+            "examples": [
+              "2026-10-06T20:42:37"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Address",
+            "examples": [
+              "新北市板橋區中山路一段161號"
+            ]
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude",
+            "examples": [
+              121.4627
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude",
+            "examples": [
+              25.012
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "car",
+          "recorded_at",
+          "address",
+          "longitude",
+          "latitude",
+          "id"
+        ],
+        "title": "LocationOut"
+      },
+      "LocationPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LocationOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "LocationPage"
+      },
+      "LocationPatch": {
+        "properties": {
+          "car": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Car"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          }
+        },
+        "type": "object",
+        "title": "LocationPatch"
+      },
+      "LocationUpdate": {
+        "properties": {
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "examples": [
+              "KEA-0001"
+            ]
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At",
+            "examples": [
+              "2026-10-06T20:42:37"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Address",
+            "examples": [
+              "新北市板橋區中山路一段161號"
+            ]
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude",
+            "examples": [
+              121.4627
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude",
+            "examples": [
+              25.012
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "car",
+          "recorded_at",
+          "address",
+          "longitude",
+          "latitude"
+        ],
+        "title": "LocationUpdate"
+      },
+      "NearbyLocationOut": {
+        "properties": {
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "examples": [
+              "KEA-0001"
+            ]
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Recorded At",
+            "examples": [
+              "2026-10-06T20:42:37"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Address",
+            "examples": [
+              "新北市板橋區中山路一段161號"
+            ]
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude",
+            "examples": [
+              121.4627
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude",
+            "examples": [
+              25.012
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "distance_m": {
+            "type": "number",
+            "title": "Distance M",
+            "description": "與查詢點的距離（公尺）"
+          }
+        },
+        "type": "object",
+        "required": [
+          "car",
+          "recorded_at",
+          "address",
+          "longitude",
+          "latitude",
+          "id",
+          "distance_m"
+        ],
+        "title": "NearbyLocationOut"
+      },
+      "RefreshResult": {
+        "properties": {
+          "records": {
+            "type": "integer",
+            "title": "Records"
+          },
+          "districts": {
+            "type": "integer",
+            "title": "Districts"
+          },
+          "routes": {
+            "type": "integer",
+            "title": "Routes"
+          },
+          "trucks": {
+            "type": "integer",
+            "title": "Trucks"
+          },
+          "locations": {
+            "type": "integer",
+            "title": "Locations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "records",
+          "districts",
+          "routes",
+          "trucks",
+          "locations"
+        ],
+        "title": "RefreshResult"
+      },
+      "RouteCreate": {
+        "properties": {
+          "city_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "City Id",
+            "examples": [
+              "6500100"
+            ]
+          },
+          "line_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Line Id",
+            "examples": [
+              "210001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_id",
+          "line_id"
+        ],
+        "title": "RouteCreate"
+      },
+      "RouteOut": {
+        "properties": {
+          "city_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "City Id",
+            "examples": [
+              "6500100"
+            ]
+          },
+          "line_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Line Id",
+            "examples": [
+              "210001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_id",
+          "line_id"
+        ],
+        "title": "RouteOut"
+      },
+      "RoutePage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RouteOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "RoutePage"
+      },
+      "RoutePatch": {
+        "properties": {
+          "city_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Id"
+          }
+        },
+        "type": "object",
+        "title": "RoutePatch"
+      },
+      "RouteUpdate": {
+        "properties": {
+          "city_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "City Id",
+            "examples": [
+              "6500100"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "city_id"
+        ],
+        "title": "RouteUpdate"
+      },
+      "TruckCreate": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Line Id",
+            "examples": [
+              "210001"
+            ]
+          },
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "description": "車牌號碼",
+            "examples": [
+              "KEA-0001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id",
+          "car"
+        ],
+        "title": "TruckCreate"
+      },
+      "TruckOut": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Line Id",
+            "examples": [
+              "210001"
+            ]
+          },
+          "car": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Car",
+            "description": "車牌號碼",
+            "examples": [
+              "KEA-0001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id",
+          "car"
+        ],
+        "title": "TruckOut"
+      },
+      "TruckPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TruckOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "items"
+        ],
+        "title": "TruckPage"
+      },
+      "TruckPatch": {
+        "properties": {
+          "line_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 16
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Line Id"
+          }
+        },
+        "type": "object",
+        "title": "TruckPatch"
+      },
+      "TruckUpdate": {
+        "properties": {
+          "line_id": {
+            "type": "string",
+            "maxLength": 16,
+            "title": "Line Id",
+            "examples": [
+              "210001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "line_id"
+        ],
+        "title": "TruckUpdate"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
